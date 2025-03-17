@@ -53,7 +53,6 @@ static void fill_points(t_map *map, char *line, int y)
         free(split[x]);
         x++;
     }
-    free(split[x]);
     free(split);
 }
 
@@ -85,7 +84,7 @@ t_map *read_map(char *filename)
     
     map->width = count_words(line, ' ');
     map->height = 1;  // İlk satırı sayıyoruz
-    free(line);
+    
     while ((line = get_next_line(fd)))
     {
         if (count_words(line, ' ') > 0)
@@ -140,6 +139,5 @@ t_map *read_map(char *filename)
         free(line);
     }
     close(fd);
-    
     return (map);
 }

@@ -1,4 +1,4 @@
-ÿþNAME = fdf
+NAME = fdf
 
 SRCS = draw.c main.c read_map.c utils.c libft_utils.c ft_split.c get_next_line.c get_next_line_utils.c 
 
@@ -12,10 +12,10 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	make -C minilibx_linux 
-	$(CC$(CFLAGS$(OBJS$(MLX_FLAGS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) $(MLX_FLAGS) -o $(NAME)
 
 %.o: %.c
-	$(CC$(CFLAGS-Iminilibx_linux -c $< -o $@
+	$(CC) $(CFLAGS) -Iminilibx_linux -c $< -o $@
 
 clean:
 	make -C ./minilibx_linux clean

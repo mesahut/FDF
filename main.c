@@ -46,9 +46,6 @@ int handle_key(int keycode, t_data *data)
     if (keycode == 53 || keycode == 65307)  // ESC key
     {
         mlx_destroy_window(data->mlx, data->win);
-        mlx_destroy_image(data->mlx, data->img.img);
-        mlx_destroy_display(data->mlx);
-        free(data->mlx);
         free_map(data->map);
         exit(0);
     }
