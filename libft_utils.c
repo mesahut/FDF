@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   libft_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/20 23:59:24 by marvin            #+#    #+#             */
+/*   Updated: 2025/03/20 23:59:24 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
 
 static int	ft_negative(char *a1, int *sw)
@@ -41,17 +53,96 @@ int	ft_atoi(char *str)
 	return (number);
 }
 
-void	*ft_memset(void *b, int c, size_t len)
+int	get_map_data(t_map *map, int fd)
 {
-	size_t	a;
-	char	*s;
+	char	*line;
 
-	s = (char *)b;
-	a = 0;
-	while (a < len)
+	line = get_next_line(fd);
+	if (!line)
 	{
-		s[a] = (char)c;
-		a++;
+		close(fd);
+		return (0);
 	}
-	return (b);
+	map->width = word_count(line, ' ');
+	map->height = 1;// İlk satırı sayıyoruz
+	free(line);
+	while ((line = get_next_line(fd)))
+	{
+		if (word_count(line, ' ') > 0)
+			map->height++;
+		free(line);
+	}
+	return (1);
+}
+
+int	allocate_points(t_map *map)
+{
+	int	y;
+
+	y = 0;
+	map->points = (t_point **)malloc(sizeof(t_point *) * map->height);
+	if (!map->points)
+	{
+		return (0);
+	}
+	while (y < map->height)
+	{
+		map->points[y] = (t_point *)malloc(sizeof(t_point) * map->width);
+		if (!map->points[y])
+			return (0);
+		y++;
+	}
+	return (1);
+}
+
+int	update_map(t_map *map, int fd)
+{
+	char	*line;
+	int		y;
+
+	y = 0;
+	while ((line = get_next_line(fd)))
+	{
+		if (count_words(line, ' ') > 0)
+		{
+			if (fill_points(map, line, y++) == 0)
+			{
+				free(line);
+				return (0);
+			}
+		}
+		free(line);
+	}
+	return (1);
+}
+
+void	*cleaner(t_map *map)
+{
+	int	y;
+
+	y = 0;
+	if (map->points)
+	{
+		while (y < map->height)
+		{
+			free(map->points[y]);
+			y++;
+		}
+		free(map->points);
+	}
+	if (map)
+		free(map);
+	return (NULL);
+}
+
+void	ft_putstr(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		write(1, &s[i], 1);
+		i++;
+	}
 }

@@ -66,11 +66,10 @@ void transform_point(t_point *p, t_data *data)
     float z = p->z * data->scale;
     
     // Apply height scaling factor to prevent extreme values
-    float height_limit = HEIGHT;
-    if (z > height_limit)
-        z = height_limit;
-    else if (z < -height_limit)
-        z = -height_limit;
+    if (z > HEIGHT)
+        z = HEIGHT;
+    else if (z < -HEIGHT)
+        z = -HEIGHT;
 
     isometric_projection(&x, &y, z);
     
@@ -140,38 +139,47 @@ void adjust_shift_for_overflow(t_data *data)
     }
 }
 
+void    draw_width(t_data *data, t_point current, int y)
+{
+    int     x;
+    t_point right;
+    t_point down;
+
+    x = 0;
+    while( x < data->map->width)
+    {
+        current = data->map->points[y][x];
+        transform_point(&current, data);
+
+        if (x < data->map->width - 1)
+        {
+            right = data->map->points[y][x + 1];
+            transform_point(&right, data);
+            draw_line(data, current, right);
+        }
+        
+        if (y < data->map->height - 1)
+        {
+            down = data->map->points[y + 1][x];
+            transform_point(&down, data);
+            draw_line(data, current, down);
+        }
+        x++;
+    }
+}
+
 void draw(t_data *data)
 {
-    int x, y;
-    t_point current, right, down;
+    int y;
+    t_point current;
 
     // Adjust shift before drawing to prevent overflow
     adjust_shift_for_overflow(data);
-
-    ft_memset(data->img.addr, 0, WIDTH * HEIGHT * (data->img.bits_per_pixel / 8));
-
-    for (y = 0; y < data->map->height; y++)
+    y = 0;
+    while(y < data->map->height)
     {
-        for (x = 0; x < data->map->width; x++)
-        {
-            current = data->map->points[y][x];
-            transform_point(&current, data);
-
-            if (x < data->map->width - 1)
-            {
-                right = data->map->points[y][x + 1];
-                transform_point(&right, data);
-                draw_line(data, current, right);
-            }
-            
-            if (y < data->map->height - 1)
-            {
-                down = data->map->points[y + 1][x];
-                transform_point(&down, data);
-                draw_line(data, current, down);
-            }
-        }
+        draw_width(data, current, y);
+        y++;
     }
-
     mlx_put_image_to_window(data->mlx, data->win, data->img.img, 0, 0);
 }

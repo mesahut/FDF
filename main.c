@@ -9,19 +9,15 @@ void init_data(t_data *data)
     float center_x;
     float center_y;
     float max_height_diff;
-    int check;
-    
+        
     data->mlx = mlx_init();
     data->win = mlx_new_window(data->mlx, WIDTH, HEIGHT, "FDF");
     data->img.img = mlx_new_image(data->mlx, WIDTH, HEIGHT);
     data->img.addr = mlx_get_data_addr(data->img.img, &data->img.bits_per_pixel,
                                     &data->img.line_length, &data->img.endian);
-    
-    check = 1;
+
     // Calculate maximum height difference
     max_height_diff = get_max_height(data->map) - get_min_height(data->map);
-    if((get_max_height(data->map) + get_min_height(data->map)) < 0)
-        check *= -1;
     
     // Calculate map dimensions after isometric projection
     map_width_iso = (data->map->width + data->map->height) * cos(0.523599); // 30 degrees in radians
@@ -45,7 +41,7 @@ void init_data(t_data *data)
 
     // Set shift values to center the map
     data->shift_x = SHIFT_X - (iso_x * data->scale);
-    data->shift_y = SHIFT_Y - (iso_y * data->scale) + (HEIGHT * 0.1 * check); // Move the map 20% down the screen
+    data->shift_y = SHIFT_Y - (iso_y * data->scale) + (HEIGHT * 0.1); // Move the map 20% down the screen
 }
 
 int close_window(t_data *data)
@@ -74,23 +70,20 @@ int main(int argc, char **argv)
 
     if (argc != 2)
     {
-        printf("Usage: %s <filename>\n", argv[0]);
+        ft_putstr("Error: Too many arguments.");
         return (1);
     }
 
     data.map = read_map(argv[1]);
     if (!data.map)
     {
-        printf("Error: could not read the map\n");
+        ft_putstr("Error: could not read the map.");
         return (1);
     }
-
     init_data(&data);
     draw(&data);
-
     mlx_key_hook(data.win, handle_key, &data);
     mlx_hook(data.win, 17, 1L<<17, close_window, &data); // Çarpı tuşu için olay dinleyicisi
     mlx_loop(data.mlx);
-
     return (0);
 }
