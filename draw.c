@@ -22,27 +22,40 @@ void isometric_projection(float *x, float *y, float z)
 
 void draw_line(t_data *data, t_point start, t_point end)
 {
-    float delta_x = end.x - start.x;
-    float delta_y = end.y - start.y;
-    float pixel_x = start.x;
-    float pixel_y = start.y;
-    float pixel_count = fmax(fabs(delta_x), fabs(delta_y));
-    
-    if (pixel_count == 0)
-        return;
-        
-    delta_x /= pixel_count;
-    delta_y /= pixel_count;
-    
-    while (pixel_count > 0)
+    int dx = abs((int)end.x - (int)start.x);
+    int dy = -abs((int)end.y - (int)start.y);
+    int sx = start.x < end.x ? 1 : -1;
+    int sy = start.y < end.y ? 1 : -1;
+    int err = dx + dy;
+    int e2;
+    int x = (int)start.x;
+    int y = (int)start.y;
+
+    while (1)
     {
-        if (pixel_x >= 0 && pixel_x < WIDTH && pixel_y >= 0 && pixel_y < HEIGHT)
+        if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
         {
-            my_mlx_pixel_put(&data->img, pixel_x, pixel_y, start.color);
+            my_mlx_pixel_put(&data->img, x, y, start.color);
         }
-        pixel_x += delta_x;
-        pixel_y += delta_y;
-        pixel_count--;
+        
+        if (x == (int)end.x && y == (int)end.y)
+            break;
+            
+        e2 = 2 * err;
+        if (e2 >= dy)
+        {
+            if (x == (int)end.x)
+                break;
+            err += dy;
+            x += sx;
+        }
+        if (e2 <= dx)
+        {
+            if (y == (int)end.y)
+                break;
+            err += dx;
+            y += sy;
+        }
     }
 }
 
@@ -65,10 +78,75 @@ void transform_point(t_point *p, t_data *data)
     p->y = y + data->shift_y;
 }
 
+void calculate_map_boundaries(t_data *data, float *min_y, float *max_y)
+{
+    int x, y;
+    t_point p;
+    
+    *min_y = HEIGHT;
+    *max_y = -HEIGHT;
+    
+    for (y = 0; y < data->map->height; y++)
+    {
+        for (x = 0; x < data->map->width; x++)
+        {
+            p = data->map->points[y][x];
+            
+            // Temporarily transform to check boundaries without actually setting p
+            float temp_x = p.x * data->scale;
+            float temp_y = p.y * data->scale;
+            float temp_z = p.z * data->scale;
+            
+            if (temp_z > HEIGHT)
+                temp_z = HEIGHT;
+            else if (temp_z < -HEIGHT)
+                temp_z = -HEIGHT;
+                
+            isometric_projection(&temp_x, &temp_y, temp_z);
+            
+            temp_y += data->shift_y;
+            
+            if (temp_y < *min_y)
+                *min_y = temp_y;
+            if (temp_y > *max_y)
+                *max_y = temp_y;
+        }
+    }
+}
+
+void adjust_shift_for_overflow(t_data *data)
+{
+    float min_y, max_y;
+    
+    calculate_map_boundaries(data, &min_y, &max_y);
+    
+    // Check if map overflows the window
+    int top_overflow = 0;
+    int bottom_overflow = 0;
+    
+    if (min_y < 0)
+        top_overflow = -min_y;
+    if (max_y > HEIGHT)
+        bottom_overflow = max_y - HEIGHT;
+    
+    // If there's overflow, adjust shift_y
+    if (top_overflow > 0)
+    {
+        data->shift_y += top_overflow + 50; // Add padding of 50 pixels
+    }
+    else if (bottom_overflow > 0)
+    {
+        data->shift_y -= bottom_overflow + 50; // Add padding of 50 pixels
+    }
+}
+
 void draw(t_data *data)
 {
     int x, y;
     t_point current, right, down;
+
+    // Adjust shift before drawing to prevent overflow
+    adjust_shift_for_overflow(data);
 
     ft_memset(data->img.addr, 0, WIDTH * HEIGHT * (data->img.bits_per_pixel / 8));
 
@@ -94,5 +172,6 @@ void draw(t_data *data)
             }
         }
     }
+
     mlx_put_image_to_window(data->mlx, data->win, data->img.img, 0, 0);
 }

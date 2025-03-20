@@ -35,25 +35,25 @@ static int get_color(char *str)
     return (color);
 }
 
-static void fill_points(t_map *map, char *line, int y)
+static void fill_points(t_map *map, char *line, int j)
 {
     char **split;
-    int x;
+    int i;
 
     split = ft_split(line, ' ');
     if (!split)
         return;
-    x = 0;
-    while (split[x] && x < map->width)
+    i = 0;
+    while (split[i] && i < map->width)
     {
-        map->points[y][x].x = x;
-        map->points[y][x].y = y;
-        map->points[y][x].z = ft_atoi(split[x]);
-        map->points[y][x].color = get_color(split[x]);
-        free(split[x]);
-        x++;
+        map->points[j][i].x = i;
+        map->points[j][i].y = j;
+        map->points[j][i].z = ft_atoi(split[i]);
+        map->points[j][i].color = get_color(split[i]);
+        free(split[i]);
+        i++;
     }
-    free(split[x]);
+    free(split[i]);
     free(split);
 }
 

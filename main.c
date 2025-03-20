@@ -9,6 +9,7 @@ void init_data(t_data *data)
     float center_x;
     float center_y;
     float max_height_diff;
+    int check;
     
     data->mlx = mlx_init();
     data->win = mlx_new_window(data->mlx, WIDTH, HEIGHT, "FDF");
@@ -16,8 +17,11 @@ void init_data(t_data *data)
     data->img.addr = mlx_get_data_addr(data->img.img, &data->img.bits_per_pixel,
                                     &data->img.line_length, &data->img.endian);
     
+    check = 1;
     // Calculate maximum height difference
     max_height_diff = get_max_height(data->map) - get_min_height(data->map);
+    if((get_max_height(data->map) + get_min_height(data->map)) < 0)
+        check *= -1;
     
     // Calculate map dimensions after isometric projection
     map_width_iso = (data->map->width + data->map->height) * cos(0.523599); // 30 degrees in radians
@@ -30,7 +34,7 @@ void init_data(t_data *data)
     scale_x = (WIDTH * 0.7) / map_width_iso;
     scale_y = (HEIGHT * 0.7) / map_height_iso;
     data->scale = (scale_x < scale_y) ? scale_x : scale_y;
-    
+
     // Calculate center point of the map
     center_x = (data->map->width - 1) / 2.0;
     center_y = (data->map->height - 1) / 2.0;
@@ -38,26 +42,31 @@ void init_data(t_data *data)
     // Calculate center point after isometric projection
     float iso_x = (center_x - center_y) * cos(0.523599);
     float iso_y = (center_x + center_y) * sin(0.523599);
-    
+
     // Set shift values to center the map
     data->shift_x = SHIFT_X - (iso_x * data->scale);
-    data->shift_y = SHIFT_Y - (iso_y * data->scale) + (HEIGHT * 0.1); // Move the map 20% down the screen
+    data->shift_y = SHIFT_Y - (iso_y * data->scale) + (HEIGHT * 0.1 * check); // Move the map 20% down the screen
+}
+
+int close_window(t_data *data)
+{
+    mlx_destroy_image(data->mlx, data->img.img);
+    mlx_destroy_window(data->mlx, data->win);
+    free_map(data->map);
+    mlx_destroy_display(data->mlx);
+    free(data->mlx);
+    exit(0);
+    return (0);
 }
 
 int handle_key(int keycode, t_data *data)
 {
     if (keycode == 53 || keycode == 65307)  // ESC key
     {
-        mlx_destroy_image(data->mlx, data->img.img);
-        mlx_destroy_window(data->mlx, data->win);
-        free_map(data->map);
-        mlx_destroy_display(data->mlx);
-        free(data->mlx);
-        exit(0);
+        close_window(data);
     }
     return (0);
 }
-
 
 int main(int argc, char **argv)
 {
@@ -80,6 +89,7 @@ int main(int argc, char **argv)
     draw(&data);
 
     mlx_key_hook(data.win, handle_key, &data);
+    mlx_hook(data.win, 17, 1L<<17, close_window, &data); // Çarpı tuşu için olay dinleyicisi
     mlx_loop(data.mlx);
 
     return (0);
