@@ -44,9 +44,6 @@ typedef struct s_data
 	void *win;
 	t_img img;
 	t_map *map;
-	float angle_x;
-	float angle_y;
-	float angle_z;
 	float scale;
 	int shift_x;
 	int shift_y;
@@ -69,6 +66,7 @@ char    *ft_strchr(const char *s, int c);
 int     ft_atoi(char *str);
 float   get_max_height(t_map *map);
 float   get_min_height(t_map *map);
+int	word_count(const char *s, char c);
 
 
 #endif

@@ -6,7 +6,7 @@ static void	free_malloc(char **f, int k)
 		free(f[k]);
 }
 
-static int	word_count(const char *s, char c)
+int	word_count(const char *s, char c)
 {
 	int	a;
 	int	b;

@@ -51,6 +51,13 @@ void transform_point(t_point *p, t_data *data)
     float x = p->x * data->scale;
     float y = p->y * data->scale;
     float z = p->z * data->scale;
+    
+    // Apply height scaling factor to prevent extreme values
+    float height_limit = HEIGHT;
+    if (z > height_limit)
+        z = height_limit;
+    else if (z < -height_limit)
+        z = -height_limit;
 
     isometric_projection(&x, &y, z);
     

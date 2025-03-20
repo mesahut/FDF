@@ -21,11 +21,14 @@ void init_data(t_data *data)
     
     // Calculate map dimensions after isometric projection
     map_width_iso = (data->map->width + data->map->height) * cos(0.523599); // 30 degrees in radians
-    map_height_iso = (data->map->width + data->map->height) * sin(0.523599) + max_height_diff;
     
-    // Calculate scale to fit map in window with extra space for height
+    // Add height factor with a scaling factor to prevent overflow
+    float height_factor = fmin(max_height_diff, max_height_diff * (WIDTH / (float)HEIGHT));
+    map_height_iso = (data->map->width + data->map->height) * sin(0.523599) + height_factor;
+    
+    // Calculate scale to fit map in window with safe margins
     scale_x = (WIDTH * 0.7) / map_width_iso;
-    scale_y = (HEIGHT * 0.6) / map_height_iso;
+    scale_y = (HEIGHT * 0.7) / map_height_iso;
     data->scale = (scale_x < scale_y) ? scale_x : scale_y;
     
     // Calculate center point of the map
@@ -36,30 +39,25 @@ void init_data(t_data *data)
     float iso_x = (center_x - center_y) * cos(0.523599);
     float iso_y = (center_x + center_y) * sin(0.523599);
     
-    // Set shift values to center the map with extra space at top
+    // Set shift values to center the map
     data->shift_x = SHIFT_X - (iso_x * data->scale);
-    data->shift_y = SHIFT_Y - (iso_y * data->scale) - (HEIGHT * 0.05);
+    data->shift_y = SHIFT_Y - (iso_y * data->scale) + (HEIGHT * 0.1); // Move the map 20% down the screen
 }
 
 int handle_key(int keycode, t_data *data)
 {
     if (keycode == 53 || keycode == 65307)  // ESC key
     {
+        mlx_destroy_image(data->mlx, data->img.img);
         mlx_destroy_window(data->mlx, data->win);
         free_map(data->map);
+        mlx_destroy_display(data->mlx);
+        free(data->mlx);
         exit(0);
     }
     return (0);
 }
 
-int handle_mouse(int button, int x, int y, t_data *data)
-{
-    (void)button;
-    (void)x;
-    (void)y;
-    (void)data;
-    return (0);
-}
 
 int main(int argc, char **argv)
 {
@@ -82,7 +80,6 @@ int main(int argc, char **argv)
     draw(&data);
 
     mlx_key_hook(data.win, handle_key, &data);
-    mlx_mouse_hook(data.win, handle_mouse, &data);
     mlx_loop(data.mlx);
 
     return (0);

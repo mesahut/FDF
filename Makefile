@@ -11,7 +11,7 @@ MLX_FLAGS = -Lminilibx_linux -lmlx -lXext -lX11 -lm
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	make -C minilibx_linux 
+	make -C minilibx_linux
 	$(CC) $(CFLAGS) $(OBJS) $(MLX_FLAGS) -o $(NAME)
 
 %.o: %.c
