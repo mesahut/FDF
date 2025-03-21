@@ -10,7 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minilibx_linux/mlx.h"
 #include "fdf.h"
+#include <stdlib.h>
+
+void	free_map(t_map *map)
+{
+	int	i;
+
+	i = 0;
+	if (!map)
+		return ;
+	if (map->points)
+	{
+		while (i < map->height)
+		{
+			if (map->points[i])
+				free(map->points[i]);
+			i++;
+		}
+		free(map->points);
+	}
+	free(map);
+}
 
 int	close_window(t_data *data)
 {
@@ -49,24 +71,4 @@ int	handle_key(int keycode, t_data *data)
 		close_window(data);
 	}
 	return (0);
-}
-
-int	allocate_points(t_map *map)
-{
-	int	y;
-
-	y = 0;
-	map->points = (t_point **)malloc(sizeof(t_point *) * map->height);
-	if (!map->points)
-	{
-		return (0);
-	}
-	while (y < map->height)
-	{
-		map->points[y] = (t_point *)malloc(sizeof(t_point) * map->width);
-		if (!map->points[y])
-			return (0);
-		y++;
-	}
-	return (1);
 }

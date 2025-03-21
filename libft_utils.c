@@ -10,90 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "fdf.h"
-
-static int	ft_negative(char *a1, int *sw)
-{
-	int	j;
-	int	ops;
-
-	j = 0;
-	ops = 1;
-	while ((a1[j] >= 9 && a1[j] <= 13) || a1[j] == 32)
-	{
-		j++;
-	}
-	if (a1[j] == 45 || a1[j] == 43)
-	{
-		if (a1[j] == 45)
-			ops *= -1;
-		j++;
-	}
-	*sw = j;
-	return (ops);
-}
+#include <unistd.h>
+#include <stdlib.h>
 
 int	ft_atoi(char *str)
 {
 	int			i;
 	long int	number;
-	int			negative;
-	char		*s1;
+	int			sign;
 
-	s1 = (char *)str;
+	i = 0;
 	number = 0;
-	negative = ft_negative(s1, &i);
-	while (s1[i] >= 48 && s1[i] <= 57)
+	sign = 1;
+	if (str[i] == 45 || str[i] == 43)
 	{
-		number *= 10;
-		number += s1[i] - 48;
+		if (str[i] == 45)
+			sign *= -1;
 		i++;
 	}
-	number *= negative;
+	while (str[i] >= 48 && str[i] <= 57)
+	{
+		number *= 10;
+		number += str[i] - 48;
+		i++;
+	}
+	number *= sign;
 	return (number);
-}
-
-int	get_map_data(t_map *map, int fd)
-{
-	char	*line;
-
-	line = get_next_line(fd);
-	if (!line)
-	{
-		close(fd);
-		return (0);
-	}
-	map->width = word_count(line, ' ');
-	map->height = 1;
-	free(line);
-	while ((line = get_next_line(fd)))
-	{
-		if (word_count(line, ' ') > 0)
-			map->height++;
-		free(line);
-	}
-	return (1);
-}
-
-int	update_map(t_map *map, int fd)
-{
-	char	*line;
-	int		y;
-
-	y = 0;
-	while ((line = get_next_line(fd)))
-	{
-		if (count_words(line, ' ') > 0)
-		{
-			if (fill_points(map, line, y++) == 0)
-			{
-				free(line);
-				return (0);
-			}
-		}
-		free(line);
-	}
-	return (1);
 }
 
 void	ft_putstr(char *s)
@@ -106,4 +48,39 @@ void	ft_putstr(char *s)
 		write(1, &s[i], 1);
 		i++;
 	}
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	while (*s)
+	{
+		if (*s == (char)c)
+			return ((char *)s);
+		s++;
+	}
+	if ((char)c == '\0')
+		return ((char *)s);
+	return (NULL);
+}
+
+int	ft_atoi_base(char *str, int base)
+{
+	int	result;
+	int	digit;
+
+	result = 0;
+	while (*str)
+	{
+		if (*str >= '0' && *str <= '9')
+			digit = *str - '0';
+		else if (*str >= 'a' && *str <= 'f')
+			digit = *str - 'a' + 10;
+		else if (*str >= 'A' && *str <= 'F')
+			digit = *str - 'A' + 10;
+		else
+			break ;
+		result = result * base + digit;
+		str++;
+	}
+	return (result);
 }

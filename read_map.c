@@ -11,6 +11,9 @@
 /* ************************************************************************** */
 
 #include "fdf.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
 int	count_words(char *line, char delimiter)
 {
@@ -19,7 +22,7 @@ int	count_words(char *line, char delimiter)
 
 	in_word = 0;
 	count = 0;
-	while (*line)
+	while (line && *line)
 	{
 		if (*line != delimiter && !in_word)
 		{

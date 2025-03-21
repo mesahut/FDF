@@ -1,4 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   draw.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/21 10:50:21 by marvin            #+#    #+#             */
+/*   Updated: 2025/03/21 10:50:21 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minilibx_linux/mlx.h"
 #include "fdf.h"
+#include <math.h>
 
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
@@ -6,7 +20,7 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 
 	if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
 	{
-		dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
+		dst = img->addr + (y * img->line_length + x * (img->bit_pixel / 8));
 		*(unsigned int *)dst = color;
 	}
 }
@@ -22,45 +36,6 @@ void	isometric_projection(float *x, float *y, float z)
 	*y = (previous_x + previous_y) * sin(0.5) - z;
 }
 
-void	draw_line(t_data *data, t_point start, t_point end)
-{
-    int dx = abs((int)end.x - (int)start.x);
-    int dy = -abs((int)end.y - (int)start.y);
-    int sx = start.x < end.x ? 1 : -1;
-    int sy = start.y < end.y ? 1 : -1;
-    int err = dx + dy;
-    int e2;
-    int x = (int)start.x;
-    int y = (int)start.y;
-
-    while (1)
-    {
-        if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
-        {
-            my_mlx_pixel_put(&data->img, x, y, start.color);
-        }
-        
-        if (x == (int)end.x && y == (int)end.y)
-            break;
-            
-        e2 = 2 * err;
-        if (e2 >= dy)
-        {
-            if (x == (int)end.x)
-                break;
-            err += dy;
-            x += sx;
-        }
-        if (e2 <= dx)
-        {
-            if (y == (int)end.y)
-                break;
-            err += dx;
-            y += sy;
-        }
-    }
-}
-
 void	transform_point(t_point *p, t_data *data)
 {
 	float	x;
@@ -73,64 +48,6 @@ void	transform_point(t_point *p, t_data *data)
 	isometric_projection(&x, &y, z);
 	p->x = x + data->shift_x;
 	p->y = y + data->shift_y;
-}
-
-void calculate_map_boundaries(t_data *data, float *min_y, float *max_y)
-{
-    int x, y;
-    t_point p;
-
-    
-    *min_y = HEIGHT;
-    *max_y = -HEIGHT;
-    
-    for (y = 0; y < data->map->height; y++)
-    {
-        for (x = 0; x < data->map->width; x++)
-        {
-            p = data->map->points[y][x];
-            
-            // Temporarily transform to check boundaries without actually setting p
-            float temp_x = p.x * data->scale;
-            float temp_y = p.y * data->scale;
-            float temp_z = p.z * data->scale;
-
-			if (temp_z > HEIGHT)
-				temp_z = HEIGHT;
-			else if (temp_z < -HEIGHT)
-				temp_z = -HEIGHT;    
-			isometric_projection(&temp_x, &temp_y, temp_z);
-			temp_y += data->shift_y;
-			if (temp_y < *min_y)
-				*min_y = temp_y;
-			if (temp_y > *max_y)
-				*max_y = temp_y;
-		}
-	}
-}
-
-void	adjust_shift_for_overflow(t_data *data)
-{
-	float	min_y;
-	float	max_y;
-	int		bottom_overflow;
-	int		top_overflow;
-
-	calculate_map_boundaries(data, &min_y, &max_y);
-	top_overflow = 0;
-	bottom_overflow = 0;
-	if (min_y < 0)
-		top_overflow = -min_y;
-	if (max_y > HEIGHT)
-		bottom_overflow = max_y - HEIGHT;
-	if (top_overflow > 0)
-	{
-		data->shift_y += top_overflow + 50;
-	}
-	else if (bottom_overflow > 0)
-	{
-		data->shift_y -= bottom_overflow + 50;
-	}
 }
 
 void	draw_width(t_data *data, t_point current, int y)
@@ -165,7 +82,7 @@ void	draw(t_data *data)
 	int		y;
 	t_point	current;
 
-	adjust_shift_for_overflow(data);
+	adjust_shift(data);
 	y = 0;
 	while (y < data->map->height)
 	{

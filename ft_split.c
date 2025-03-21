@@ -25,7 +25,7 @@ int	word_count(const char *s, char c)
 
 	a = 0;
 	b = 0;
-	while (s[a] != '\0')
+	while (s && s[a] != '\0')
 	{
 		while (s[a] == c && s[a] != '\0')
 			a++;

@@ -11,61 +11,9 @@
 /* ************************************************************************** */
 
 #include "fdf.h"
-
-void	free_map(t_map *map)
-{
-	int	i;
-
-	i = 0;
-	if (!map)
-		return ;
-	if (map->points)
-	{
-		while (i < map->height)
-		{
-			if (map->points[i])
-				free(map->points[i]);
-			i++;
-		}
-		free(map->points);
-	}
-	free(map);
-}
-
-int	ft_atoi_base(char *str, int base)
-{
-	int	result;
-	int	digit;
-
-	result = 0;
-	while (*str)
-	{
-		if (*str >= '0' && *str <= '9')
-			digit = *str - '0';
-		else if (*str >= 'a' && *str <= 'f')
-			digit = *str - 'a' + 10;
-		else if (*str >= 'A' && *str <= 'F')
-			digit = *str - 'A' + 10;
-		else
-			break ;
-		result = result * base + digit;
-		str++;
-	}
-	return (result);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	while (*s)
-	{
-		if (*s == (char)c)
-			return ((char *)s);
-		s++;
-	}
-	if ((char)c == '\0')
-		return ((char *)s);
-	return (NULL);
-}
+#include <unistd.h>
+#include <stdlib.h>
+#include "get_next_line.h"
 
 float	get_max_height(t_map *map)
 {
@@ -109,4 +57,72 @@ float	get_min_height(t_map *map)
 		y++;
 	}
 	return (min_height);
+}
+
+int	allocate_points(t_map *map)
+{
+	int	y;
+
+	y = 0;
+	map->points = (t_point **)malloc(sizeof(t_point *) * map->height);
+	if (!map->points)
+	{
+		return (0);
+	}
+	while (y < map->height)
+	{
+		map->points[y] = (t_point *)malloc(sizeof(t_point) * map->width);
+		if (!map->points[y])
+			return (0);
+		y++;
+	}
+	return (1);
+}
+
+int	update_map(t_map *map, int fd)
+{
+	char	*line;
+	int		y;
+
+	y = 0;
+	while (1)
+	{
+		line = get_next_line(fd);
+		if (line == NULL)
+			break ;
+		if (count_words(line, ' ') > 0)
+		{
+			if (fill_points(map, line, y) == 0)
+			{
+				free(line);
+				return (0);
+			}
+		}
+		y++;
+		free(line);
+	}
+	return (1);
+}
+
+int	get_map_data(t_map *map, int fd)
+{
+	char	*line;
+
+	line = get_next_line(fd);
+	if (!line)
+	{
+		close(fd);
+		return (0);
+	}
+	map->width = count_words(line, ' ');
+	map->height = 1;
+	free(line);
+	while (line != NULL)
+	{
+		line = get_next_line(fd);
+		if (count_words(line, ' ') > 0)
+			map->height++;
+		free(line);
+	}
+	return (1);
 }

@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minilibx_linux/mlx.h"
 #include "fdf.h"
+#include <math.h>
 
 void	calculate_scale(t_data *data, float scale_x, float scale_y)
 {
@@ -57,7 +59,7 @@ void	init_data(t_data *data)
 	data->mlx = mlx_init();
 	data->win = mlx_new_window(data->mlx, WIDTH, HEIGHT, "FDF");
 	data->img.img = mlx_new_image(data->mlx, WIDTH, HEIGHT);
-	data->img.addr = mlx_get_data_addr(data->img.img, &data->img.bits_per_pixel,
+	data->img.addr = mlx_get_data_addr(data->img.img, &data->img.bit_pixel,
 			&data->img.line_length, &data->img.endian);
 	calculate_scale(data, scale_x, scale_y);
 	calculate_shift(data);
