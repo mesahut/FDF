@@ -33,7 +33,7 @@ void	isometric_projection(float *x, float *y, float z)
 	previous_x = *x;
 	previous_y = *y;
 	*x = (previous_x - previous_y) * cos(0.5);
-	*y = (previous_x + previous_y) * sin(0.5) - z;
+	*y = (previous_x + previous_y) * sin(0.5) - (z / 3);
 }
 
 void	transform_point(t_point *p, t_data *data)
@@ -82,7 +82,6 @@ void	draw(t_data *data)
 	int		y;
 	t_point	current;
 
-	adjust_shift(data);
 	y = 0;
 	while (y < data->map->height)
 	{

@@ -32,9 +32,6 @@ typedef struct s_draw_data
 	int	sy;
 	int	end_x;
 	int	end_y;
-	int	start_x;
-	int	start_y;
-	int	should_break;
 }	t_draw_data;
 
 typedef struct s_map
@@ -66,7 +63,6 @@ typedef struct s_data
 
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void	draw_line(t_data *data, t_point start, t_point end);
-void	isometric_projection(float *x, float *y, float z);
 int		fill_points(t_map *map, char *line, int j);
 int		count_words(char *line, char delimiter);
 int		handle_key(int keycode, t_data *data);
@@ -76,12 +72,8 @@ char	*ft_strchr(const char *s, int c);
 int		get_map_data(t_map *map, int fd);
 int		update_map(t_map *map, int fd);
 int		allocate_points(t_map *map);
-void	adjust_shift(t_data *data);
-float	get_max_height(t_map *map);
-float	get_min_height(t_map *map);
 int		close_window(t_data *data);
 t_map	*read_map(char *filename);
-char	*get_next_line(int fd);
 void	*cleaner(t_map *map);
 void	draw(t_data *data);
 int		ft_atoi(char *str);

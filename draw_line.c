@@ -21,7 +21,7 @@ void	check_condition(int *err, int *x, int *y, t_draw_data *d)
 	if (error2 >= d->dy)
 	{
 		if (*x == d->end_x)
-			d->should_break = 1;
+			return ;
 		else
 		{
 			*err += d->dy;
@@ -31,7 +31,7 @@ void	check_condition(int *err, int *x, int *y, t_draw_data *d)
 	if (error2 <= d->dx)
 	{
 		if (*y == d->end_y)
-			d->should_break = 1;
+			return ;
 		else
 		{
 			*err += d->dx;
@@ -49,13 +49,11 @@ void	draw_line_worker(t_data *data, t_point start, t_draw_data d)
 	x = (int)start.x;
 	y = (int)start.y;
 	err = d.dx + d.dy;
-	while (!d.should_break)
+	while (1)
 	{
 		my_mlx_pixel_put(&data->img, x, y, start.color);
-		if (x == d.end_x && y == d.end_y)
-			break ;
 		check_condition(&err, &x, &y, &d);
-		if (d.should_break)
+		if (x == d.end_x && y == d.end_y)
 			break ;
 	}
 }
@@ -76,6 +74,5 @@ void	draw_line(t_data *data, t_point start, t_point end)
 		d.sy = -1;
 	d.end_x = (int)end.x;
 	d.end_y = (int)end.y;
-	d.should_break = 0;
 	draw_line_worker(data, start, d);
 }

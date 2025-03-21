@@ -15,50 +15,6 @@
 #include <stdlib.h>
 #include "get_next_line.h"
 
-float	get_max_height(t_map *map)
-{
-	int		x;
-	int		y;
-	float	max_height;
-
-	max_height = map->points[0][0].z;
-	y = 0;
-	while (y < map->height)
-	{
-		x = 0;
-		while (x < map->width)
-		{
-			if (map->points[y][x].z > max_height)
-				max_height = map->points[y][x].z;
-			x++;
-		}
-		y++;
-	}
-	return (max_height);
-}
-
-float	get_min_height(t_map *map)
-{
-	int		x;
-	int		y;
-	float	min_height;
-
-	min_height = map->points[0][0].z;
-	y = 0;
-	while (y < map->height)
-	{
-		x = 0;
-		while (x < map->width)
-		{
-			if (map->points[y][x].z < min_height)
-				min_height = map->points[y][x].z;
-			x++;
-		}
-		y++;
-	}
-	return (min_height);
-}
-
 int	allocate_points(t_map *map)
 {
 	int	y;
