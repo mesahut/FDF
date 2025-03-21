@@ -23,8 +23,6 @@
 
 # define WIDTH 1920
 # define HEIGHT 1080
-# define SHIFT_X WIDTH / 2
-# define SHIFT_Y HEIGHT / 2
 
 typedef struct s_point
 {
@@ -67,7 +65,6 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void	free_map(t_map *map);
 void	isometric_projection(float *x, float *y, float z);
 int		handle_key(int keycode, t_data *data);
-int		handle_mouse(int button, int x, int y, t_data *data);
 void	init_data(t_data *data);
 char	**ft_split(char const *s, char c);
 char	*get_next_line(int fd);
@@ -84,5 +81,8 @@ int		fill_points(t_map *map, char *line, int j);
 int		count_words(char *line, char delimiter);
 void	*cleaner(t_map *map);
 void	ft_putstr(char *s);
+void	calculate_shift(t_data *data);
+int		close_window(t_data *data);
+void	calculate_scale(t_data *data, float scale_x, float scale_y);
 
 #endif

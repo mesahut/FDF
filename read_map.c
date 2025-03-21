@@ -38,7 +38,7 @@ int	get_color(char *str)
 	int		color;
 	char	*comma;
 
-	color = 0xFFFFFF;// Default white color
+	color = 0xFFFFFF;
 	comma = ft_strchr(str, ',');
 	if (comma)
 	{

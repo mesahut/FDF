@@ -64,33 +64,13 @@ int	get_map_data(t_map *map, int fd)
 		return (0);
 	}
 	map->width = word_count(line, ' ');
-	map->height = 1;// İlk satırı sayıyoruz
+	map->height = 1;
 	free(line);
 	while ((line = get_next_line(fd)))
 	{
 		if (word_count(line, ' ') > 0)
 			map->height++;
 		free(line);
-	}
-	return (1);
-}
-
-int	allocate_points(t_map *map)
-{
-	int	y;
-
-	y = 0;
-	map->points = (t_point **)malloc(sizeof(t_point *) * map->height);
-	if (!map->points)
-	{
-		return (0);
-	}
-	while (y < map->height)
-	{
-		map->points[y] = (t_point *)malloc(sizeof(t_point) * map->width);
-		if (!map->points[y])
-			return (0);
-		y++;
 	}
 	return (1);
 }
@@ -114,25 +94,6 @@ int	update_map(t_map *map, int fd)
 		free(line);
 	}
 	return (1);
-}
-
-void	*cleaner(t_map *map)
-{
-	int	y;
-
-	y = 0;
-	if (map->points)
-	{
-		while (y < map->height)
-		{
-			free(map->points[y]);
-			y++;
-		}
-		free(map->points);
-	}
-	if (map)
-		free(map);
-	return (NULL);
 }
 
 void	ft_putstr(char *s)
