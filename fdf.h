@@ -16,11 +16,12 @@
 # define WIDTH 1920
 # define HEIGHT 1080
 
+#include <stdio.h>
 typedef struct s_point
 {
 	float	x;
 	float	y;
-	float	z;
+	int		z;
 	int		color;
 }	t_point;
 
@@ -59,12 +60,13 @@ typedef struct s_data
 	float	scale;
 	int		shift_x;
 	int		shift_y;
+	int		a;
 }	t_data;
 
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void	draw_line(t_data *data, t_point start, t_point end);
 int		fill_points(t_map *map, char *line, int j);
-int		count_words(char *line, char delimiter);
+int		word_count(const char *s, char c);
 int		handle_key(int keycode, t_data *data);
 int		ft_atoi_base(char *str, int base);
 char	**ft_split(char const *s, char c);

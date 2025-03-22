@@ -25,7 +25,7 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 	}
 }
 
-void	isometric_projection(float *x, float *y, float z)
+void	isometric_projection(float *x, float *y, float z, t_data *data)
 {
 	float	previous_x;
 	float	previous_y;
@@ -33,7 +33,7 @@ void	isometric_projection(float *x, float *y, float z)
 	previous_x = *x;
 	previous_y = *y;
 	*x = (previous_x - previous_y) * cos(0.5);
-	*y = (previous_x + previous_y) * sin(0.5) - (z / 3);
+	*y = (previous_x + previous_y) * sin(0.5) - (z / data->a);
 }
 
 void	transform_point(t_point *p, t_data *data)
@@ -45,7 +45,7 @@ void	transform_point(t_point *p, t_data *data)
 	x = p->x * data->scale;
 	y = p->y * data->scale;
 	z = p->z * data->scale;
-	isometric_projection(&x, &y, z);
+	isometric_projection(&x, &y, z, data);
 	p->x = x + data->shift_x;
 	p->y = y + data->shift_y;
 }

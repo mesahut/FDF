@@ -12,7 +12,6 @@
 
 #include "minilibx_linux/mlx.h"
 #include "fdf.h"
-#include <math.h>
 #include <stdio.h>
 
 void	init_data(t_data *data)
@@ -27,12 +26,17 @@ void	init_data(t_data *data)
 			&data->img.line_length, &data->img.endian);
 	data->shift_x = WIDTH / 2;
 	data->shift_y = HEIGHT / 2;
-	scale_w = (WIDTH * 0.3) / data->map->width;
-	scale_h = (HEIGHT * 0.3) / data->map->height;
+	scale_w = (WIDTH * 0.4) / data->map->width;
+	scale_h = (HEIGHT * 0.4) / data->map->height;
 	if (scale_w < scale_h)
 		data->scale = scale_w;
 	else
 		data->scale = scale_h;
+	if((data->map->height * data->map->width) < 200)
+		data->a = 6;
+	else
+		data->a = 3;
+	
 }
 
 int	main(int argc, char **argv)

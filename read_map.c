@@ -57,11 +57,12 @@ int	fill_points(t_map *map, char *line, int j)
 	char	**split;
 	int		i;
 
+
 	split = ft_split(line, ' ');
 	if (!split)
 		return (0);
 	i = 0;
-	while (split[i] && i < map->width)
+	while (split[i])
 	{
 		map->points[j][i].x = i;
 		map->points[j][i].y = j;
@@ -70,7 +71,6 @@ int	fill_points(t_map *map, char *line, int j)
 		free(split[i]);
 		i++;
 	}
-	free(split[i]);
 	free(split);
 	return (1);
 }

@@ -20,7 +20,7 @@ int	allocate_points(t_map *map)
 	int	y;
 
 	y = 0;
-	map->points = (t_point **)malloc(sizeof(t_point *) * map->height);
+	map->points = (t_point **)malloc(sizeof(t_point *) * (map->height));
 	if (!map->points)
 	{
 		return (0);
@@ -46,13 +46,10 @@ int	update_map(t_map *map, int fd)
 		line = get_next_line(fd);
 		if (line == NULL)
 			break ;
-		if (count_words(line, ' ') > 0)
+		if (fill_points(map, line, y) == 0)
 		{
-			if (fill_points(map, line, y) == 0)
-			{
-				free(line);
-				return (0);
-			}
+			free(line);
+			return (0);
 		}
 		y++;
 		free(line);
@@ -70,13 +67,13 @@ int	get_map_data(t_map *map, int fd)
 		close(fd);
 		return (0);
 	}
-	map->width = count_words(line, ' ');
+	map->width = word_count(line, ' ');
 	map->height = 1;
 	free(line);
 	while (line != NULL)
 	{
 		line = get_next_line(fd);
-		if (count_words(line, ' ') > 0)
+		if (word_count(line, ' ') > 0)
 			map->height++;
 		free(line);
 	}
